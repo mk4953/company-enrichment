@@ -1,7 +1,7 @@
+using System.ComponentModel.DataAnnotations;
 using CompanyEnrichment.Api.Cvr;
 using CompanyEnrichment.Api.Statistics;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace CompanyEnrichment.Api.Controllers;
 
@@ -26,9 +26,12 @@ public class CompaniesController : ControllerBase
     /// <summary>
     /// Lookup by CVR number, e.g. GET api/companies/10150817?year=2024
     /// </summary>
+    /// <remarks>[Required] makes ASP.NET Core return 400 automatically when year is missing.</remarks>
     [HttpGet("{cvrNumber:int}")]
     public async Task<ActionResult<CompanyProfile>> GetByCvrNumber(
-        int cvrNumber, [FromQuery][BindRequired] int year, CancellationToken cancellationToken)
+        int cvrNumber,
+        [Required] int? year,
+        CancellationToken cancellationToken)
     {
         var company = await _cvrClient.GetByCvrNumberAsync(cvrNumber, cancellationToken);
         if (company == null)
@@ -36,15 +39,18 @@ public class CompaniesController : ControllerBase
             return NotFound();
         }
 
-        return await BuildProfileAsync(company, year, cancellationToken);
+        return await BuildProfileAsync(company, year!.Value, cancellationToken);
     }
 
     /// <summary>
     /// Lookup by name, e.g. GET api/companies?name=Erhvervsstyrelsen&amp;year=2024
     /// </summary>
+    /// <remarks>[Required] makes ASP.NET Core return 400 automatically when name or year is missing.</remarks>
     [HttpGet]
     public async Task<ActionResult<CompanyProfile>> GetByName(
-        [FromQuery] string name, [FromQuery][BindRequired] int year, CancellationToken cancellationToken)
+        [Required] string name,
+        [Required] int? year,
+        CancellationToken cancellationToken)
     {
         var companies = await _cvrClient.SearchByNameAsync(name, cancellationToken);
 
@@ -54,7 +60,7 @@ public class CompaniesController : ControllerBase
             return NotFound();
         }
 
-        return await BuildProfileAsync(company, year, cancellationToken);
+        return await BuildProfileAsync(company, year!.Value, cancellationToken);
     }
 
     private async Task<CompanyProfile> BuildProfileAsync(CvrCompany company, int year, CancellationToken cancellationToken)

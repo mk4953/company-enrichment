@@ -2,6 +2,8 @@
 
 A small ASP.NET Core service that looks up a Danish company in the CVR registry ([apicvr.dk](https://apicvr.dk)) and enriches it with industry statistics from Statistics Denmark ([api.statbank.dk](https://api.statbank.dk), table `ERHV1`) in a single response.
 
+![Dataflow](docs/dataflow.svg)
+
 ## Run locally
 
 **.NET 10 SDK**
