@@ -33,3 +33,13 @@ Content-Type: application/json
     { "code": "TID", "values": ["2024"] }
   ]
 }
+
+# Calls to the service running in Docker on port 8080.
+# Start it with "docker build -t company-enrichment ." and "docker run --rm -p 8080:8080 company-enrichment".
+
+### Lookup by CVR number (Novo Nordisk) -> company data and industry statistics in one response
+GET http://localhost:8080/api/companies/24256790?year=2024
+
+### Metrics in Prometheus format (response time and status codes for the service, CVR and Statistics Denmark)
+# Send a few requests first, otherwise there is nothing to show
+GET http://localhost:8080/metrics
