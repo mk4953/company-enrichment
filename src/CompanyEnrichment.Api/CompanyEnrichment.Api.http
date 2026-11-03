@@ -1,0 +1,26 @@
+# Manual example requests for trying out the API locally.
+# Start the service with "dotnet run --project src/CompanyEnrichment.Api",
+# and click "Send Request" above a request (REST Client in VS Code or Visual Studio).
+
+@baseUrl = http://localhost:5162
+
+### Lookup by CVR number (Novo Nordisk)
+GET {{baseUrl}}/api/companies/24256790?year=2024
+
+### Lookup by name
+GET {{baseUrl}}/api/companies?name=Novo Nordisk A/S&year=2024
+
+### New industry code (DB25) without statistics at DST -> industryStatistics: null
+GET {{baseUrl}}/api/companies/35954716?year=2024
+
+### Year without data at DST -> industryStatistics: null
+GET {{baseUrl}}/api/companies/24256790?year=2030
+
+### Company does not exist -> 404
+GET {{baseUrl}}/api/companies/12345678?year=2024
+
+### Missing year -> 400
+GET {{baseUrl}}/api/companies/24256790
+
+### Metrics in Prometheus format (response time and status codes for the service and the external sources)
+GET {{baseUrl}}/metrics

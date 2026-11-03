@@ -1,0 +1,49 @@
+name: CI
+
+# Azure DevOps equivalent: "trigger" and "pr"
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    # Azure DevOps equivalent: "pool: vmImage"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # needed to push the image to ghcr.io
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      # Azure DevOps equivalent: DotNetCoreCLI@2 task
+      - name: Build and test
+        run: dotnet test
+
+      # ghcr.io requires lowercase image names
+      - name: Set image name
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+
+      # GITHUB_TOKEN is provided automatically, so no service connection is needed
+      - name: Log in to GitHub Container Registry
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Azure DevOps equivalent: Docker@2 task. Pull requests only build the image, they do not publish it.
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: ${{ github.event_name == 'push' }}
+          tags: |
+            ${{ env.IMAGE }}:latest
+            ${{ env.IMAGE }}:${{ github.sha }}

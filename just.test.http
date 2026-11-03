@@ -1,0 +1,35 @@
+# Direct calls to Statistics Denmark, for comparing GET and POST.
+# Both return the same CSV. The service itself uses POST, as described in the assignment.
+
+### GET: the whole query in the URL ("Ø" in LØNSUM must be URL-encoded as %C3%98)
+GET https://api.statbank.dk/v1/data/ERHV1/CSV?valuePresentation=Code&BRANCHE07=212000&TAL=ARBSTED,ANSATTE,FULDBESK,L%C3%98NSUM&TID=2024
+
+### POST: the same query as a JSON body (what StatbankClient sends)
+POST https://api.statbank.dk/v1/data
+Content-Type: application/json
+
+{
+  "table": "ERHV1",
+  "format": "CSV",
+  "valuePresentation": "Code",
+  "variables": [
+    { "code": "BRANCHE07", "values": ["212000"] },
+    { "code": "TAL", "values": ["ARBSTED", "ANSATTE", "FULDBESK", "LØNSUM"] },
+    { "code": "TID", "values": ["2024"] }
+  ]
+}
+
+### Unknown industry code (new DB25 code) -> 400 EXTRACT-NOTFOUND
+POST https://api.statbank.dk/v1/data
+Content-Type: application/json
+
+{
+  "table": "ERHV1",
+  "format": "CSV",
+  "valuePresentation": "Code",
+  "variables": [
+    { "code": "BRANCHE07", "values": ["471200"] },
+    { "code": "TAL", "values": ["ARBSTED"] },
+    { "code": "TID", "values": ["2024"] }
+  ]
+}
