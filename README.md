@@ -20,6 +20,12 @@ docker build -t company-enrichment .
 docker run --rm -p 8080:8080 company-enrichment   # http://localhost:8080
 ```
 
+Or run the image published by CI:
+
+```bash
+docker run --rm -p 8080:8080 ghcr.io/mk4953/company-enrichment:latest
+```
+
 ## Try it
 
 | Request | Description |
@@ -58,7 +64,7 @@ More examples, including error cases, are in [CompanyEnrichment.Api.http](src/Co
 | Situation | Response |
 |---|---|
 | Company not found | `404` |
-| `year` missing | `400` |
+| `year` or `name` missing | `400` |
 | No statistics for the industry code or year | `200` with `industryStatistics: null` |
 | Statistics Denmark unavailable | `200` with `industryStatistics: null` (logged as a warning) |
 | CVR unavailable | `503` |
